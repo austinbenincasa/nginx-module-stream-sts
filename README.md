@@ -22,3 +22,31 @@ The core of the `Dockerfile` was taken from:
 abenincasa@computer:~/nginx-module-stream-sts$ docker build -t "nginx:stream" .
 abenincasa@computer:~/nginx-module-stream-sts$ docker run -p 80:80 -p 443:443 nginx:stream
 ```
+
+## NGINX Config
+
+The current `nginx.config` file included in the repo is configured as a TCP Load Balancer.
+To use the current config file for this purpose edit the server link to point to a backend server(s) and port accepting 
+TCP traffic. 
+
+To understand more about NGINX TCP/UDP Load Balancing reference: [Nginx Load Balancing](https://docs.nginx.com/nginx/admin-guide/load-balancer/tcp-udp-load-balancer/)
+```
+stream {
+    server_traffic_status_zone;
+    upstream backend {
+        # change these to point to your backend servers
+        server XXX.XXX.XXX.XXX:443 max_fails=3 fail_timeout=10s;
+        server XXX.XXX.XXX.XXX:443 max_fails=3 fail_timeout=10s;
+        server XXX.XXX.XXX.XXX:443 max_fails=3 fail_timeout=10s;
+    }
+    server {
+        listen 443;
+        proxy_pass backend;
+        proxy_next_upstream on;
+    }
+}
+
+
+
+
+```
